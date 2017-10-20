@@ -1,0 +1,18 @@
+<head>
+<title>Working...</title>
+</head>
+<body>
+<form method="POST" name="hiddenform" action="<%= endpoint %>">
+
+<input type="hidden" name="wa" value="<%=  wa %>" />
+
+<input type="hidden" name="wresult" value="<%= wresult %>" />
+
+<input type="hidden" name="wctx" value="<%= wctx %>" />
+
+<noscript>
+<p>Script is disabled. Click Submit to continue.</p>
+<input type="submit" value="Submit" /></noscript>
+</form>
+<script language="javascript">window.setTimeout('document.forms[0].submit()', 0);</script>
+</body>

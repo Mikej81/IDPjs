@@ -1,84 +1,77 @@
 {
- "server" : {
-  "ip" : "127.0.0.1",
-  "port" : 8443,
-  "cert" : "./server/F5ADFS.lab.local.crt",
-  "key" : "./server/F5ADFS.lab.local.key"
- },
- "session" : {
-  "name" : "FakeADFS",
-  "secret" : "FakeADFSsecret"
- },
- "federation" : {
-  "issuer" : "http://F5ADFS.lab.local",
-  "certs" : {
-    "issuercert" : "./server/F5ADFS.lab.local.crt",
-    "issuerkey" : "./server/F5ADFS.lab.local.key",
-    "tokendecryptcert" : "./server/F5ADFS.lab.local.crt",
-    "tokendecryptkey" : "./server/F5ADFS.lab.local.key",
-    "tokensigningcert" : "./server/F5ADFS.lab.local.crt",
-    "tokensigningkey" : "./server/F5ADFS.lab.local.key"
+  "server": {
+    "ip": "154.154.154.150",
+    "port": 8443,
+    "cert": "./server/fakeadfs.f5lab.com.crt",
+    "key": "./server/fakeadfs.f5lab.com.key"
   },
-  "timeout" : "28800",
-  "attributes" : {
-   "email" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
-   "upn" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn",
-   "givenname" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
-   "displayname" : "http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata",
-   "surname" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname",
-   "group" : "http://schemas.xmlsoap.org/claims/Group",
-   "role" : "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-   "windowsaccount" : "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname"
+  "session": {
+    "name": "FakeADFS",
+    "secret": "FakeADFSsecret"
   },
- "metadata": {
-  "issuer" : "",
-  "endpointpath" : "",
-  "cert" : "",
-  "key" : "",
-  "digestalgorith" : "",
-  "signaturealgorith" : ""
- },
- "idp" : {
-  "wa" : "signin1.0",
-  "wctx" : "https://authentication.url.com/login.aspx",
-  "wtrealm" : "urn:sharepoint:*"
- },
- "saml" : {
-  "signature" : {
-    "rsa-sha256" : "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-    "rsa-sha1" : "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-  },
-  "digest" : {
-    "sha256" : "http://www.w3.org/2001/04/xmlenc#sha256",
-    "sha1" : "http://www.w3.org/2000/09/xmldsig#sha1"
+  "federation": {
+    "issuer": "http://fakeadfs.f5lab.com",
+    "certs": {
+      "issuercert": "./server/fakeadfs.f5lab.com.crt",
+      "issuerkey": "./server/fakeadfs.f5lab.com.key",
+      "tokendecryptcert": "./server/fakeadfs.f5lab.com.crt",
+      "tokendecryptkey": "./server/fakeadfs.f5lab.com.key",
+      "tokensigningcert": "./server/fakeadfs.f5lab.com.crt",
+      "tokensigningkey": "./server/fakeadfs.f5lab.com.key"
+    },
+    "timeout": "28800",
+    "attributes": {
+      "email": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+      "upn": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn",
+      "givenname": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
+      "displayname": "http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata",
+      "surname": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname",
+      "group": "http://schemas.xmlsoap.org/claims/Group",
+      "role": "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+      "windowsaccount": "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname"
+    },
+    "metadata": {
+      "issuer": "",
+      "endpointpath": "",
+      "cert": "",
+      "key": "",
+      "digestalgorith": "",
+      "signaturealgorith": ""
+    },
+    "idp": {
+      "wa": "signin1.0",
+      "wctx": "https://authentication.url.com/login.aspx",
+      "wtrealm": "urn:sharepoint:*"
+    },
+    "saml": {
+      "signature": {
+        "rsa-sha256": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+        "rsa-sha1": "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+      },
+      "digest": {
+        "sha256": "http://www.w3.org/2001/04/xmlenc#sha256",
+        "sha1": "http://www.w3.org/2000/09/xmldsig#sha1"
+      }
+    },
+    "relyingpartners": [
+      { "name": "urn:sharepoint:f5lab",
+        "options": {
+          "encryption": "",
+          "signature": "",
+          "acceptedclaims": ["role", "name"],
+          "endpoints": { "url": "https://sharepoint.f5lab.com/_trust/", "binding": "POST" } } },
+      { "name": "https://sharepoint.f5lab.com/_trust/",
+        "options": {
+          "encryption": "",
+          "signature": "",
+          "acceptedclaims": ["role", "name"],
+          "endpoints": { "url": "https://sharepoint.f5lab.com/_trust/", "binding": "POST" } } },
+      { "name":"https://app.f5lab.com/WFE",
+        "options": {
+          "encryption": "",
+          "signature": "",
+          "acceptedclaims": ["role", "name"],
+          "endpoints": { "url": "https://app.f5lab.com/WFE", "binding": "POST" } } }
+     ]
   }
- },
- "relyingpartners" : {
-   "urn:sharepoint:f5lab" : {
-    "encryption": "",
-    "signature": "",
-    "acceptedclaims": [ "role", "name"],
-    "endpoints": {
-      "url": "https://sharepoint.f5lab.com/_trust/",
-      "binding": "POST"
-    }
-   },
-   "https://sharepoint.f5lab.com/_trust/" : {
-    "encryption": "",
-    "signature": "",
-    "acceptedclaims": [ "role", "name"],
-    "endpoints": {
-     "url": "https://sharepoint.f5lab.com/_trust/",
-     "binding": "POST" }
-   },
-   "https://app.f5lab.com/WFE" : {
-    "encryption": "",
-    "signature": "",
-    "acceptedclaims": [ "role", "name"],
-    "endpoints": {
-     "url":"https://app.f5lab.com/WFE",
-     "binding": "POST" }
-   }
-  }
- }
- }
+}

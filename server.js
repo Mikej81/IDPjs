@@ -6,15 +6,15 @@
 // Some things are hardcoded for testing purposes while i develop and test.
 
 var path = require('path')
+var jsonQuery = require('json-query')
 var config = require('read-config')(path.join(__dirname, 'config.json'))
 var queryString = require('querystring')
 var fs = require('fs')
 var moment = require('moment')
-
+var url = require('url')
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy;
 var db = require('./db');
-
 
 var timeout = config.federation.timeout
 
@@ -44,6 +44,7 @@ var sts = require('./templates').STS
 var app = express()
 var server = require('https').createServer(secureOptions, app)
 
+
 // Configure the local strategy for use by Passport.
 //
 // The local strategy require a `verify` function which receives the credentials
@@ -67,6 +68,7 @@ passport.use(new LocalStrategy(
 // typical implementation of this is as simple as supplying the user ID when
 // serializing, and querying the user record by ID from the database when
 // deserializing.
+
 passport.serializeUser(function(user, cb) {
   cb(null, user.id);
 });
@@ -82,6 +84,7 @@ passport.deserializeUser(function(id, cb) {
 app.use(session)
 app.use(require('morgan')('combined'))
 app.use(require('cookie-parser')())
+app.use(require('body-parser').json())
 app.use(require('body-parser').urlencoded({ extended: true }))
 
 app.use(passport.initialize())
@@ -97,7 +100,7 @@ app.disable('x-powered-by')
 app.use(express.static(path.join(__dirname, '/server')))
 
 app.get('/', function (req, res) {
-  res.redirect('/login');
+  res.redirect(302, '/login');
 })
 
 // Act as STS Metadata Provider
@@ -121,15 +124,18 @@ app.get('/login', function (req, res) {
 app.post('/login', passport.authenticate('local', {
     failureRedirect: '/login' }),
   function(req, res) {
-  if (!req.query.wctx) {
-    // IDP initiated, need to see what apps are availabel, check endpoints in config!
-    console.log('send to apps!')
+  var refererUri = req.headers.referer
+  if (!refererUri) {
+    // IDP initiated, need to see what apps are available, check endpoints in config!
     res.redirect('/apps')
   } else {
     // SP Initiated, redirect back to requester!
-    // req.url.wctx
-    // '/adfs/ls/?wa=signin1.0&wctx=https://localhost/&wtrealm=urn:sharepoint:\*'
-    res.redirect('/adfs/ls/?wa=signin1.0&wctx=https://localhost/&wtrealm=urn:sharepoint:\*');
+    console.log('[SP Initiated! Let it flow!]')
+    var contexturi = url.parse(refererUri, true)
+    var refererWa = contexturi.query.wa
+    var refererWctx = contexturi.query.wctx
+    var refererWtRealm = contexturi.query.wtrealm
+    res.redirect('/adfs/ls/?wa=' + refererWa + '&wctx=' + refererWctx + '&wtrealm=' + refererWtRealm);
   }
 })
 
@@ -196,6 +202,9 @@ app.get('/adfs/ls/\*', function (req, res) {
   if (typeof wtrealm === 'undefined') {
     wtrealm = config.federation.idp.wtrealm
   }
+  var relyingpartners = config.federation
+  var EndPointfilter = jsonQuery('relyingpartners[name=' + wtrealm + '].options.endpoints.url', { data: relyingpartners})
+  var endPoint = EndPointfilter.value
 
     /* Generate WSFed Assertion.  These attributes are
        configured previously in the code.
@@ -225,8 +234,9 @@ app.get('/adfs/ls/\*', function (req, res) {
 
     /* Sign the Assertion */
   var signedAssertion = wsfed.create(wsfed_options)
-  res.set('Content-Type', 'text/xml')
-  res.send(signedAssertion)
+  // res.set('Content-Type', 'text/xml')
+  //res.send(signedAssertion)
+  res.render('working', { endpoint: endPoint, wa: wa, wresult: signedAssertion, wctx: wctx})
  }
 })
 

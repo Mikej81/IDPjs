@@ -5,7 +5,7 @@
 var config = require('./server').config
 var server = require('./server').server
 
-server.listen({host: config.server.ip, port: config.server.port}, function() {
+server.listen({host: config.server.ip, port: config.server.port || 443}, function() {
   console.log('FakeADFS listening at ' + config.server.ip + ':' + config.server.port + '...')
 })
 
