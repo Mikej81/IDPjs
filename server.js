@@ -21,8 +21,8 @@ var timeout = config.federation.timeout
 // Federation Values
 var wsfedIssuer = config.federation.issuer
 
-var SigningCert = fs.readFileSync(path.join(__dirname, config.federation.cert))
-var SigningKey = fs.readFileSync(path.join(__dirname, config.federation.key))
+var SigningCert = fs.readFileSync(path.join(__dirname, config.federation.certs.tokensigningcert))
+var SigningKey = fs.readFileSync(path.join(__dirname, config.federation.certs.tokensigningkey))
 
 // Server Cert / Key
 var serverCert = fs.readFileSync(path.join(__dirname, config.server.cert))
@@ -87,15 +87,17 @@ app.use(require('body-parser').urlencoded({ extended: true }))
 app.use(passport.initialize())
 app.use(passport.session())
 
-//app.use(myutil.basicAuth)
+// Configure view engine to render EJS templates.
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
 app.disable('x-powered-by')
 
 // Static Files
 app.use(express.static(path.join(__dirname, '/server')))
 
 app.get('/', function (req, res) {
-  console.log('get /')
-  res.send('TEST');
+  res.redirect('/login');
 })
 
 // Act as STS Metadata Provider
@@ -115,14 +117,31 @@ app.get('/login', function (req, res) {
   //  WIF applications will do a passive redirect to STS to auth.
   res.sendFile(path.join(__dirname, '/server/index.html'));
 })
-app.post('/login',
-  passport.authenticate('local', {
-    failureRedirect: '/login',
-    successRedirect:'/adfs/ls/?wa=signin1.0&wctx=https://localhost/&wtrealm=urn:sharepoint:\*',
-    failureFlash: false }),
+
+app.post('/login', passport.authenticate('local', {
+    failureRedirect: '/login' }),
   function(req, res) {
-    // something else?
+  if (!req.query.wctx) {
+    // IDP initiated, need to see what apps are availabel, check endpoints in config!
+    console.log('send to apps!')
+    res.redirect('/apps')
+  } else {
+    // SP Initiated, redirect back to requester!
+    // req.url.wctx
+    // '/adfs/ls/?wa=signin1.0&wctx=https://localhost/&wtrealm=urn:sharepoint:\*'
+    res.redirect('/adfs/ls/?wa=signin1.0&wctx=https://localhost/&wtrealm=urn:sharepoint:\*');
+  }
 })
+
+app.get('/apps', function (req, res) {
+  res.render('home', { user: req.user });
+})
+
+app.get('/profile', require('connect-ensure-login').ensureLoggedIn(),
+  function(req, res){
+    res.render('profile', { user: req.user });
+})
+
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/login');

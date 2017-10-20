@@ -1,6 +1,6 @@
 var utils = require('./utils.js')
 var Parser = require('xmldom').DOMParser
-var encoders = require('./encoders')
+//var encoders = require('./encoders')
 var xmlenc = require('xml-encryption')
 var SignedXml = require('xml-crypto').SignedXml
 var fs = require('fs')
@@ -9,7 +9,7 @@ var path = require('path')
 // console.log('START');
 
 // Load FederationMetadata Template
-var federationMetadata = fs.readFileSync(path.join(__dirname, '/templates/federationmetadata.template')).toString()
+var federationMetadata = fs.readFileSync(path.join(__dirname, '/adfsmetadata.template')).toString()
 
 var NAMESPACE = 'urn:oasis:names:tc:SAML:2.0:metadata'
 
