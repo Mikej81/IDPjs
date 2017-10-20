@@ -7,19 +7,17 @@ var utils = require('./utils'),
     async = require('async');
     crypto = require('crypto');
 
-var MergeXML = require('mergexml');
-
 var fs = require('fs');
 var path = require('path');
+
 var wsfed = fs.readFileSync(path.join(__dirname, 'wsfed.template')).toString();
 var saml11 = fs.readFileSync(path.join(__dirname, 'saml11.template')).toString();
 
 var WSU = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd';
 var WSP = 'http://schemas.xmlsoap.org/ws/2004/09/policy';
 var WSA = 'http://www.w3.org/2005/08/addressing';
-var NAMESPACE = 'urn:oasis:names:tc:SAML:1.0:assertion';
 
-//The element 'Signature' with namespace 'http://www.w3.org/2000/09/xmldsig#' is unrecognized.
+var NAMESPACE = 'urn:oasis:names:tc:SAML:1.0:assertion';
 
 var algorithms = {
   signature: {
@@ -61,21 +59,22 @@ exports.create = function(options, callback) {
   var wsdoc;
   try {
     doc = new Parser().parseFromString(saml11.toString());
-    wsdoc = new Parser().parseFromString(wsfed.toString());
   } catch(err){
     return utils.reportError(err, callback);
   }
 
-  var tokenCreated = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0]
-    tokenCreated.textContent = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+  wsdoc = new Parser().parseFromString(wsfed.toString());
+
+  var tokenCreated = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0];
+  tokenCreated.textContent = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
   var tokenExpires = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Expires')[0].childNodes[0];
-    tokenExpires.textContent = now.add(options.lifetimeInSeconds, 'seconds').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+  tokenExpires.textContent = now.add(options.lifetimeInSeconds, 'seconds').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
   var tokenAddress = wsdoc.documentElement.getElementsByTagNameNS(WSA, 'Address')[0].childNodes[0];
-   if (options.wsaAddress)
-    tokenAddress.textContent = options.wsaAddress
-
+  if (options.wsaAddress)
+      tokenAddress.textContent = options.wsaAddress;
+ 
   doc.documentElement.getElementsByTagNameNS(NAMESPACE, 'Assertion')[0].setAttribute('AssertionID', '_' + (options.uid || utils.uid(32)));
   if (options.issuer)
     doc.documentElement.getElementsByTagNameNS(NAMESPACE, 'Assertion')[0].setAttribute('Issuer', options.issuer);
