@@ -16,6 +16,7 @@
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
+    "express-session": "^1.15.6",
     "ldapjs": "^1.0.1",
     "moment": "^2.19.1",
     "morgan": "^1.9.0",
