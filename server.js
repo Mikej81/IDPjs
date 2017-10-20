@@ -2,6 +2,8 @@
 // Fake ADFS
 // WS-Federation IDP
 // Michael Coleman
+//
+// Some things are hardcoded for testing purposes while i develop and test.
 
 var path = require('path')
 var config = require('read-config')(path.join(__dirname, 'config.json'))
@@ -37,6 +39,7 @@ var session = require('express-session')({
 })
 
 var wsfed = require('./templates').WSFed
+var sts = require('./templates').STS
 
 var app = express()
 var server = require('https').createServer(secureOptions, app)
@@ -95,13 +98,19 @@ app.get('/', function (req, res) {
   res.send('TEST');
 })
 
-// Act as Federation Metadata Provider
-app.get('/federationmetadata/\*/federationmetadata.xml', function (req, res) {
+// Act as STS Metadata Provider
+app.get('/federationmetadata/2007-06/federationmetadata.xml', function (req, res) {
   console.log('metadata')
   // generate Metadata
 })
 
-// Act as STS Login Provider
+//  Act as ADFS Metadata Provider
+app.get('/adfs/fs/federationserverservice.asmx', function (req, res) {
+  console.log('metadata')
+  // generate Metadata
+})
+
+// Act as Login Provider
 app.get('/login', function (req, res) {
   //  WIF applications will do a passive redirect to STS to auth.
   res.sendFile(path.join(__dirname, '/server/index.html'));
@@ -119,13 +128,22 @@ app.get('/logout', function (req, res) {
   res.redirect('/login');
 })
 
+// Act as ADFS oAuth
+app.get('/adfs/oauth2', function (req, res) {
+  // ADSF OAUTH
+})
+
 // Act as WS-Trust Provider
-app.get('/adfs/services/trust/\*/:authtype', function (req, res) {
+app.get('/adfs/services/trust/2005/:authtype', function (req, res) {
+  // add authentication types to configuration file...  add in passport strategies for required strategies
   console.log('trust/auth: ' + req.params.authtype)
   // Path can determine Auth Type, I dont want to code all of these so will have to pick a few important ones.
-  //  *adfs/services/trust/*/certificate
-  //  *adfs/services/trust/*/username
-  //  *adfs/services/trust/*/issuedtoken*
+  //  /adfs/services/trust/2005/windowstransport
+  //  /adfs/services/trust/2005/certificatemixed
+  //  /adfs/services/trust/2005/certificatetransport
+  //  /adfs/services/trust/2005/usernamemixed
+  //  /adfs/services/trust/2005/kerberosmixed
+  //  /adfs/services/trust/2005/issuedtoken*
 })
 
 // Act as WS-Federation Provider

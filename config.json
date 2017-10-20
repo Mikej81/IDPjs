@@ -11,8 +11,14 @@
  },
  "federation" : {
   "issuer" : "http://F5ADFS.lab.local",
-  "cert" : "./server/F5ADFS.lab.local.crt",
-  "key" : "./server/F5ADFS.lab.local.key",
+  "certs" : {
+    "issuercert" : "./server/F5ADFS.lab.local.crt",
+    "issuerkey" : "./server/F5ADFS.lab.local.key",
+    "tokendecryptcert" : "./server/F5ADFS.lab.local.crt",
+    "tokendecryptkey" : "./server/F5ADFS.lab.local.key",
+    "tokensigningcert" : "./server/F5ADFS.lab.local.crt",
+    "tokensigningkey" : "./server/F5ADFS.lab.local.key"
+  },
   "timeout" : "28800",
   "attributes" : {
    "email" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
@@ -45,6 +51,34 @@
   "digest" : {
     "sha256" : "http://www.w3.org/2001/04/xmlenc#sha256",
     "sha1" : "http://www.w3.org/2000/09/xmldsig#sha1"
+  }
+ },
+ "relyingpartners" : {
+   "urn:sharepoint:f5lab" : {
+    "encryption": "",
+    "signature": "",
+    "acceptedclaims": [ "role", "name"],
+    "endpoints": {
+      "url": "https://sharepoint.f5lab.com/_trust/",
+      "binding": "POST"
+    }
+   },
+   "https://sharepoint.f5lab.com/_trust/" : {
+    "encryption": "",
+    "signature": "",
+    "acceptedclaims": [ "role", "name"],
+    "endpoints": {
+     "url": "https://sharepoint.f5lab.com/_trust/",
+     "binding": "POST" }
+   },
+   "https://app.f5lab.com/WFE" : {
+    "encryption": "",
+    "signature": "",
+    "acceptedclaims": [ "role", "name"],
+    "endpoints": {
+     "url":"https://app.f5lab.com/WFE",
+     "binding": "POST" }
+   }
   }
  }
  }
