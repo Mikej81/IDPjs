@@ -235,7 +235,7 @@ app.get('/adfs/ls/\*', function (req, res) {
     /* Sign the Assertion */
   var signedAssertion = wsfed.create(wsfed_options)
   // res.set('Content-Type', 'text/xml')
-  //res.send(signedAssertion)
+  console.log(signedAssertion)
   res.render('working', { endpoint: endPoint, wa: wa, wresult: signedAssertion, wctx: wctx})
  }
 })
