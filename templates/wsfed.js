@@ -58,6 +58,7 @@ exports.create = function(options, callback) {
 
   var now = moment.utc();
   var doc;
+  var wsdoc;
   try {
     doc = new Parser().parseFromString(saml11.toString());
     wsdoc = new Parser().parseFromString(wsfed.toString());
