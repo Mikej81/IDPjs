@@ -1,9 +1,9 @@
 # OpenIDP
 WS-Federation, SAML11, SAML20 IDP / SSO
 
-[Login](https://i.imgur.com/hSs18xQ.png)
+[https://i.imgur.com/hSs18xQ.png](https://i.imgur.com/hSs18xQ.png)
 
-[Applications](https://i.imgur.com/i9C99Iw.png)
+[https://i.imgur.com/i9C99Iw.png](https://i.imgur.com/i9C99Iw.png)
 
 ## Status
 
