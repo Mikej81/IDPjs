@@ -7,14 +7,19 @@ var utils = require('./utils'),
     async = require('async');
     crypto = require('crypto');
 
+var MergeXML = require('mergexml');
+
 var fs = require('fs');
 var path = require('path');
 var wsfed = fs.readFileSync(path.join(__dirname, 'wsfed.template')).toString();
+var saml11 = fs.readFileSync(path.join(__dirname, 'saml11.template')).toString();
 
 var WSU = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd';
 var WSP = 'http://schemas.xmlsoap.org/ws/2004/09/policy';
 var WSA = 'http://www.w3.org/2005/08/addressing';
 var NAMESPACE = 'urn:oasis:names:tc:SAML:1.0:assertion';
+
+//The element 'Signature' with namespace 'http://www.w3.org/2000/09/xmldsig#' is unrecognized.
 
 var algorithms = {
   signature: {
@@ -41,8 +46,7 @@ exports.create = function(options, callback) {
 
   var sig = new SignedXml(null, { signatureAlgorithm: algorithms.signature[options.signatureAlgorithm], idAttribute: 'AssertionID' });
   sig.addReference("//*[local-name(.)='Assertion']",
-                  ["http://www.w3.org/2000/09/xmldsig#enveloped-signature", "http://www.w3.org/2001/10/xml-exc-c14n#"],
-                  algorithms.digest[options.digestAlgorithm]);
+                  ["http://www.w3.org/2000/09/xmldsig#enveloped-signature", "http://www.w3.org/2001/10/xml-exc-c14n#"], algorithms.digest[options.digestAlgorithm]);
 
   sig.signingKey = options.key;
 
@@ -55,18 +59,19 @@ exports.create = function(options, callback) {
   var now = moment.utc();
   var doc;
   try {
-    doc = new Parser().parseFromString(wsfed.toString());
+    doc = new Parser().parseFromString(saml11.toString());
+    wsdoc = new Parser().parseFromString(wsfed.toString());
   } catch(err){
     return utils.reportError(err, callback);
   }
 
-  var tokenCreated = doc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0]
+  var tokenCreated = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0]
     tokenCreated.textContent = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
-  var tokenExpires = doc.documentElement.getElementsByTagNameNS(WSU, 'Expires')[0].childNodes[0];
+  var tokenExpires = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Expires')[0].childNodes[0];
     tokenExpires.textContent = now.add(options.lifetimeInSeconds, 'seconds').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
-  var tokenAddress = doc.documentElement.getElementsByTagNameNS(WSA, 'Address')[0].childNodes[0];
+  var tokenAddress = wsdoc.documentElement.getElementsByTagNameNS(WSA, 'Address')[0].childNodes[0];
    if (options.wsaAddress)
     tokenAddress.textContent = options.wsaAddress
 
@@ -139,7 +144,15 @@ exports.create = function(options, callback) {
     nameIDs[1].setAttribute('Format', options.nameIdentifierFormat);
   }
 
-  if (!options.encryptionCert) return sign(options, sig, doc, callback);
+  //if (!options.encryptionCert) return sign(options, sig, doc, callback);
+  if (!options.encryptionCert) {
+    var signedSaml = sign(options, sig, doc, callback).toString();
+    var wsFedstring = wsdoc.toString();
+    var finalFed = wsFedstring.replace('<saml:Assertion />', signedSaml)
+    //mash saml11 into wsfed, doing everything in the same doc screws up the signing
+    //
+    return finalFed;
+  }
 
   // encryption is turned on,
   var proofSecret;

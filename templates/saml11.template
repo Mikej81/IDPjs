@@ -10,8 +10,7 @@
       </saml:SubjectConfirmation>
     </saml:Subject>
   </saml:AttributeStatement>
-  <saml:AuthenticationStatement 
-      AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password">
+  <saml:AuthenticationStatement AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password">
     <saml:Subject>
        <saml:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">
        </saml:NameIdentifier>
