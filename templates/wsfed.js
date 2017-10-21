@@ -59,11 +59,10 @@ exports.create = function(options, callback) {
   var wsdoc;
   try {
     doc = new Parser().parseFromString(saml11.toString());
+	wsdoc = new Parser().parseFromString(wsfed.toString());
   } catch(err){
     return utils.reportError(err, callback);
   }
-
-  wsdoc = new Parser().parseFromString(wsfed.toString());
 
   var tokenCreated = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0];
   tokenCreated.textContent = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
@@ -74,13 +73,12 @@ exports.create = function(options, callback) {
   var tokenAddress = wsdoc.documentElement.getElementsByTagNameNS(WSA, 'Address')[0].childNodes[0];
   if (options.wsaAddress)
       tokenAddress.textContent = options.wsaAddress;
- 
-  doc.documentElement.getElementsByTagNameNS(NAMESPACE, 'Assertion')[0].setAttribute('AssertionID', '_' + (options.uid || utils.uid(32)));
+
+  doc.documentElement.setAttribute('AssertionID', '_' + (options.uid || utils.uid(32)));
   if (options.issuer)
-    doc.documentElement.getElementsByTagNameNS(NAMESPACE, 'Assertion')[0].setAttribute('Issuer', options.issuer);
+    doc.documentElement.setAttribute('Issuer', options.issuer);
 
-
-  doc.documentElement.getElementsByTagNameNS(NAMESPACE, 'Assertion')[0].setAttribute('IssueInstant', now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'));
+  doc.documentElement.setAttribute('IssueInstant', now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'));
   var conditions = doc.documentElement.getElementsByTagName('saml:Conditions');
 
   if (options.lifetimeInSeconds) {
@@ -146,11 +144,12 @@ exports.create = function(options, callback) {
 
   //if (!options.encryptionCert) return sign(options, sig, doc, callback);
   if (!options.encryptionCert) {
-    var signedSaml = sign(options, sig, doc, callback).toString();
+    var signedSaml = sign(options, sig, doc, callback);
+    console.log(signedSaml.toString())
     var wsFedstring = wsdoc.toString();
-    var finalFed = wsFedstring.replace('<saml:Assertion />', signedSaml)
+    var finalFed = wsFedstring.replace('<saml:Assertion xmlns:saml=""/>', signedSaml)
     //mash saml11 into wsfed, doing everything in the same doc screws up the signing
-    //
+    console.log(finalFed)
     return finalFed;
   }
 
