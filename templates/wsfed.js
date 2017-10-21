@@ -54,7 +54,7 @@ exports.create = function(options, callback) {
     }
   };
 
-  var now = moment.utc();
+
   var doc;
   var wsdoc;
   try {
@@ -63,6 +63,7 @@ exports.create = function(options, callback) {
   } catch(err){
     return utils.reportError(err, callback);
   }
+  var now = moment.utc();
 
   var tokenCreated = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0];
   tokenCreated.textContent = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
@@ -148,7 +149,7 @@ exports.create = function(options, callback) {
     console.log(signedSaml.toString())
     var wsFedstring = wsdoc.toString();
     var finalFed = wsFedstring.replace('<saml:Assertion xmlns:saml=""/>', signedSaml)
-    //mash saml11 into wsfed, doing everything in the same doc screws up the signing
+    
     console.log(finalFed)
     return finalFed;
   }
