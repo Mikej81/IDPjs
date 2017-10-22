@@ -10,6 +10,8 @@ var utils = require('./utils'),
 var fs = require('fs');
 var path = require('path');
 
+var momenttz = require('moment-timezone');
+
 var wsfed = fs.readFileSync(path.join(__dirname, 'wsfed.template')).toString();
 var saml11 = fs.readFileSync(path.join(__dirname, 'saml11.template')).toString();
 
@@ -64,6 +66,8 @@ exports.create = function(options, callback) {
     return utils.reportError(err, callback);
   }
   var now = moment.utc();
+    // there seems to be an issue with windows and order firing and changing timezone for NotBefore...
+  var issued = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
   var tokenCreated = wsdoc.documentElement.getElementsByTagNameNS(WSU, 'Created')[0].childNodes[0];
   tokenCreated.textContent = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
@@ -83,7 +87,7 @@ exports.create = function(options, callback) {
   var conditions = doc.documentElement.getElementsByTagName('saml:Conditions');
 
   if (options.lifetimeInSeconds) {
-    conditions[0].setAttribute('NotBefore', now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'));
+      conditions[0].setAttribute('NotBefore', issued);
     conditions[0].setAttribute('NotOnOrAfter', now.add(options.lifetimeInSeconds, 'seconds').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'));
   }
 
