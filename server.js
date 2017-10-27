@@ -125,7 +125,8 @@ app.post('/login', passport.authenticate('local', {
     failureRedirect: '/login' }),
   function(req, res) {
   var refererUri = req.headers.referer
-  if (!refererUri) {
+
+  if (refererUri.indexOf('wctx') <= 0 || refererUri.indexOf('wtrealm') <= 0) {
     // IDP initiated, need to see what apps are available, check endpoints in config!
     res.redirect('/apps')
   } else {
@@ -140,6 +141,11 @@ app.post('/login', passport.authenticate('local', {
 })
 
 app.get('/apps', function (req, res) {
+  var appEndpoints = config.federation
+  console.log('================Get EndPoints=============')
+  for(var endpoint in appEndpoints.relyingpartners) {
+  console.log(appEndpoints.relyingpartners[endpoint]);
+}
   res.render('home', { user: req.user });
 })
 
@@ -238,6 +244,18 @@ app.get('/adfs/ls/\*', function (req, res) {
   console.log(signedAssertion)
   res.render('working', { endpoint: endPoint, wa: wa, wresult: signedAssertion, wctx: wctx})
  }
+})
+
+// Act as SAML IDP
+app.get('/idp/saml/:version/:binding', function (req, res) {
+  var samlVer = req.param.version
+  var samlBinding = req.param.binding
+
+  if (samlVer == '11') {
+
+  } else if (samlVer == '20') {
+    //
+  }
 })
 
 // Express error handling

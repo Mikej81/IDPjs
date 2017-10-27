@@ -1,7 +1,7 @@
 {
   "server": {
-    "ip": "154.154.154.150",
-    "port": 8443,
+    "ip": "127.0.0.1",
+    "port": 443,
     "cert": "./server/fakeadfs.f5lab.com.crt",
     "key": "./server/fakeadfs.f5lab.com.key"
   },
@@ -55,12 +55,6 @@
     },
     "relyingpartners": [
       { "name": "urn:sharepoint:f5lab",
-        "options": {
-          "encryption": "",
-          "signature": "",
-          "acceptedclaims": ["role", "name"],
-          "endpoints": { "url": "https://sharepoint.f5lab.com/_trust/", "binding": "POST" } } },
-      { "name": "https://sharepoint.f5lab.com/_trust/",
         "options": {
           "encryption": "",
           "signature": "",
