@@ -29,7 +29,7 @@
     "read-config": "^1.6.0",
     "saml": "^0.12.4",
     "url": "^0.11.0",
-    "xml-crypto": "^0.10.1",
+    "xml-crypto": "^2.0.0",
     "xml-encryption": "^0.11.0",
     "xmldom": "^0.1.27"
   }
